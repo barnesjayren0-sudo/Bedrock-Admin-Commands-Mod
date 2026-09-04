@@ -1,0 +1,31 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:item": {
+    "description": {
+      "identifier": "admin:ban_pickaxe",
+      "menu_category": {
+        "category": "equipment",
+        "group": "minecraft:itemGroup.name.pickaxe"
+      }
+    },
+    "components": {
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:icon": { "texture": "ban_pickaxe" },
+      "minecraft:display_name": { "value": "§4Ban Pickaxe" },
+      "minecraft:durability": { "max_durability": 99999 },
+      "minecraft:damage": 8,
+      "minecraft:enchantable": { "value": 30, "slot": "pickaxe" },
+      "minecraft:digger": {
+        "use_efficiency": true,
+        "destroy_speeds": [
+          { "block": { "tags": "q.any_tag('stone', 'metal', 'diamond_pick_diggable')" }, "speed": 20 },
+          { "block": "minecraft:obsidian", "speed": 20 }
+        ]
+      },
+      "minecraft:repairable": {
+        "repair_items": [{ "items": ["minecraft:netherite_ingot"], "repair_amount": 99999 }]
+      }
+    }
+  }
+}
