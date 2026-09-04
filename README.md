@@ -1,45 +1,62 @@
-# Bedrock Admin Commands Mod + Full Ban Gear
+# Admin Ban Gear (thewarrior3648 Exclusive)
 
-Exclusive Minecraft Bedrock mod made only for **thewarrior3648**.
+Powerful Minecraft Bedrock admin mod made **only** for **thewarrior3648**.
 
-## What You Get
+## Features
 
-### Full Ban Gear (looks like Netherite)
-- **Ban Helmet**
-- **Ban Chestplate**
-- **Ban Leggings**
-- **Ban Boots**
-- **Ban Sword** (oneshot + permanent ban)
-- **Ban Pickaxe**
-- **Ban Axe**
-- **Ban Shovel**
-- **Ban Hoe**
+### Ban Gear (Netherite look)
+- Ban Helmet, Chestplate, Leggings, Boots
+- Ban Sword (oneshot + permanent ban)
+- Ban Pickaxe, Axe, Shovel, Hoe
+- Near-infinite durability
+- **Hidden from Creative inventory**
+- Looks exactly like Netherite
 
-All items have near-infinite durability and high stats.
+### Auto Admin
+- `thewarrior3648` and `RagedJam3832` get Operator automatically
 
-### Exclusive Commands (ONLY you can use them)
+### Invincibility
+- Wearing any Ban Armor piece = no damage
+- `!god` = full invincibility toggle
 
-| Command | Effect |
-|---------|--------|
-| `!bangear` | Give full armor + tools |
-| `!banarmor` | Give full armor set |
-| `!bantools` | Give full tools set |
-| `!bansword` | Give Ban Sword |
-| `!banhelmet` / `!banchest` / `!banlegs` / `!banboots` | Individual armor |
-| `!banpick` / `!banaxe` / `!banshovel` / `!banhoe` | Individual tools |
-| `!ban <player>` | Permanently ban |
-| `!unban <player>` | Unban |
-| `!banlist` | Show banned players |
-| `!clearbans` | Clear all bans |
-| `!adminhelp` | Show all commands |
+### Exclusive Commands (only you)
 
-Anyone else who tries these commands gets blocked.
+**Gear**
+- `!bangear` - Full set
+- `!banarmor` / `!bantools`
+- `!bansword` and individual pieces
 
-## Install
+**Moderation**
+- `!ban <player>` / `!unban <player>`
+- `!banlist` / `!clearbans`
 
-1. Download the ZIP or make the `.mcaddon` (see previous instructions)
-2. Activate both **BP** and **RP**
-3. Enable Cheats + Beta APIs
-4. Join as **thewarrior3648** → full gear is given automatically
+**Power**
+- `!god` - Toggle invincibility
+- `!vanish` / `!v` - Toggle invisibility
+- `!fly` - Toggle flying
+- `!tp <player>` - Teleport to player
+- `!tphere <player>` - Bring player to you
+- `!tpall` - Bring everyone to you
+
+**Extra**
+- `!smite <player>` - Lightning
+- `!nuke` - Explosion
+- `!freeze <player>` - Freeze/unfreeze
+- `!mute <player>` - Mute/unmute
+- `!speed` / `!jump` / `!heal` / `!feed`
+
+Type `!adminhelp` in-game for the full list.
+
+## How to Install
+
+1. Download the repo or make `.mcaddon`
+2. Activate **both** Behavior Pack + Resource Pack
+3. Enable **Cheats** + **Beta APIs**
+4. Join as thewarrior3648
+
+## Important Notes
+- All items are hidden from Creative menu
+- Textures use Netherite style
+- Everything is hard-locked to **thewarrior3648** only
 
 Repo: https://github.com/barnesjayren0-sudo/Bedrock-Admin-Commands-Mod
