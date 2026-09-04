@@ -2,11 +2,7 @@
   "format_version": "1.21.0",
   "minecraft:item": {
     "description": {
-      "identifier": "admin:ban_helmet",
-      "menu_category": {
-        "category": "equipment",
-        "group": "minecraft:itemGroup.name.helmet"
-      }
+      "identifier": "admin:ban_helmet"
     },
     "components": {
       "minecraft:max_stack_size": 1,
