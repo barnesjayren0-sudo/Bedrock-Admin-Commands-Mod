@@ -2,11 +2,7 @@
   "format_version": "1.21.0",
   "minecraft:item": {
     "description": {
-      "identifier": "admin:ban_hoe",
-      "menu_category": {
-        "category": "equipment",
-        "group": "minecraft:itemGroup.name.hoe"
-      }
+      "identifier": "admin:ban_hoe"
     },
     "components": {
       "minecraft:max_stack_size": 1,
