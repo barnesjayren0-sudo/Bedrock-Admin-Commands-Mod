@@ -1,9 +1,33 @@
 {
-  "resource_pack_name": "admin_ban_sword",
+  "resource_pack_name": "admin_ban_gear",
   "texture_name": "atlas.items",
   "texture_data": {
     "admin_ban_sword": {
       "textures": "textures/items/netherite_sword"
+    },
+    "ban_helmet": {
+      "textures": "textures/items/netherite_helmet"
+    },
+    "ban_chestplate": {
+      "textures": "textures/items/netherite_chestplate"
+    },
+    "ban_leggings": {
+      "textures": "textures/items/netherite_leggings"
+    },
+    "ban_boots": {
+      "textures": "textures/items/netherite_boots"
+    },
+    "ban_pickaxe": {
+      "textures": "textures/items/netherite_pickaxe"
+    },
+    "ban_axe": {
+      "textures": "textures/items/netherite_axe"
+    },
+    "ban_shovel": {
+      "textures": "textures/items/netherite_shovel"
+    },
+    "ban_hoe": {
+      "textures": "textures/items/netherite_hoe"
     }
   }
 }
