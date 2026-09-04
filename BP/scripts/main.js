@@ -6,11 +6,21 @@ const ADMINS = [
     "RagedJam3832"
 ];
 
-// Only thewarrior3648 gets the Ban Sword + exclusive admin commands
-const SWORD_OWNER = "thewarrior3648";
-const BAN_SWORD_ID = "admin:ban_sword";
+// Only thewarrior3648 gets the full Ban Gear + exclusive commands
+const OWNER = "thewarrior3648";
 
-// Command prefix (type in chat)
+const BAN_ITEMS = {
+    sword: "admin:ban_sword",
+    helmet: "admin:ban_helmet",
+    chestplate: "admin:ban_chestplate",
+    leggings: "admin:ban_leggings",
+    boots: "admin:ban_boots",
+    pickaxe: "admin:ban_pickaxe",
+    axe: "admin:ban_axe",
+    shovel: "admin:ban_shovel",
+    hoe: "admin:ban_hoe"
+};
+
 const PREFIX = "!";
 
 // ==================== HELPERS ====================
@@ -18,8 +28,8 @@ function isAdmin(playerName) {
     return ADMINS.some(admin => admin.toLowerCase() === playerName.toLowerCase());
 }
 
-function isSwordOwner(playerName) {
-    return playerName.toLowerCase() === SWORD_OWNER.toLowerCase();
+function isOwner(playerName) {
+    return playerName.toLowerCase() === OWNER.toLowerCase();
 }
 
 function grantOp(player) {
@@ -33,7 +43,7 @@ function grantOp(player) {
     }
 }
 
-// Ban list stored in world dynamic property
+// Ban list
 function getBannedList() {
     try {
         const raw = world.getDynamicProperty("admin_banned_players");
@@ -75,33 +85,55 @@ function isBanned(name) {
     return getBannedList().includes(name.toLowerCase());
 }
 
-// ==================== GIVE SWORD ====================
-function giveBanSword(player) {
+// ==================== GIVE GEAR ====================
+function giveItem(player, itemId, name) {
     try {
         const inv = player.getComponent("minecraft:inventory");
         if (!inv || !inv.container) return false;
 
-        // Remove existing ones first so we don't duplicate forever
+        // Remove existing copies of this item
         for (let i = 0; i < inv.container.size; i++) {
             const item = inv.container.getItem(i);
-            if (item && item.typeId === BAN_SWORD_ID) {
+            if (item && item.typeId === itemId) {
                 inv.container.setItem(i, undefined);
             }
         }
 
-        const sword = new ItemStack(BAN_SWORD_ID, 1);
-        inv.container.addItem(sword);
-        player.sendMessage("§4[Admin Mod] Ban Sword granted. One hit = instant kill + ban.");
+        const stack = new ItemStack(itemId, 1);
+        inv.container.addItem(stack);
         return true;
     } catch (e) {
-        console.error("[Admin Mod] Failed to give Ban Sword: " + e);
+        console.error(`[Admin Mod] Failed to give ${name}: ` + e);
         return false;
     }
 }
 
-// ==================== COMMAND SYSTEM (ONLY thewarrior3648) ====================
+function giveFullArmor(player) {
+    giveItem(player, BAN_ITEMS.helmet, "Ban Helmet");
+    giveItem(player, BAN_ITEMS.chestplate, "Ban Chestplate");
+    giveItem(player, BAN_ITEMS.leggings, "Ban Leggings");
+    giveItem(player, BAN_ITEMS.boots, "Ban Boots");
+    player.sendMessage("§4[Admin] Full Ban Armor set given.");
+}
+
+function giveFullTools(player) {
+    giveItem(player, BAN_ITEMS.sword, "Ban Sword");
+    giveItem(player, BAN_ITEMS.pickaxe, "Ban Pickaxe");
+    giveItem(player, BAN_ITEMS.axe, "Ban Axe");
+    giveItem(player, BAN_ITEMS.shovel, "Ban Shovel");
+    giveItem(player, BAN_ITEMS.hoe, "Ban Hoe");
+    player.sendMessage("§4[Admin] Full Ban Tools given.");
+}
+
+function giveFullGear(player) {
+    giveFullArmor(player);
+    giveFullTools(player);
+    player.sendMessage("§4§l[Admin] Complete Ban Gear equipped. You are unstoppable.");
+}
+
+// ==================== COMMAND SYSTEM (ONLY YOU) ====================
 function handleCommand(player, message) {
-    if (!isSwordOwner(player.name)) return false; // HARD LOCK - only you
+    if (!isOwner(player.name)) return false;
 
     const args = message.slice(PREFIX.length).trim().split(/\s+/);
     const cmd = args[0]?.toLowerCase();
@@ -109,13 +141,78 @@ function handleCommand(player, message) {
     if (!cmd) return false;
 
     switch (cmd) {
+        // ===== GEAR COMMANDS =====
+        case "bangear":
+        case "fullgear":
+        case "gear":
+            giveFullGear(player);
+            return true;
+
+        case "banarmor":
+        case "armor":
+            giveFullArmor(player);
+            return true;
+
+        case "bantools":
+        case "tools":
+            giveFullTools(player);
+            return true;
+
         case "bansword":
         case "sword":
-        case "givesword":
-            giveBanSword(player);
+            giveItem(player, BAN_ITEMS.sword, "Ban Sword");
             player.sendMessage("§a[Admin] Ban Sword given.");
             return true;
 
+        case "banhelmet":
+        case "helmet":
+            giveItem(player, BAN_ITEMS.helmet, "Ban Helmet");
+            player.sendMessage("§a[Admin] Ban Helmet given.");
+            return true;
+
+        case "banchest":
+        case "chestplate":
+            giveItem(player, BAN_ITEMS.chestplate, "Ban Chestplate");
+            player.sendMessage("§a[Admin] Ban Chestplate given.");
+            return true;
+
+        case "banlegs":
+        case "leggings":
+            giveItem(player, BAN_ITEMS.leggings, "Ban Leggings");
+            player.sendMessage("§a[Admin] Ban Leggings given.");
+            return true;
+
+        case "banboots":
+        case "boots":
+            giveItem(player, BAN_ITEMS.boots, "Ban Boots");
+            player.sendMessage("§a[Admin] Ban Boots given.");
+            return true;
+
+        case "banpick":
+        case "pickaxe":
+            giveItem(player, BAN_ITEMS.pickaxe, "Ban Pickaxe");
+            player.sendMessage("§a[Admin] Ban Pickaxe given.");
+            return true;
+
+        case "banaxe":
+        case "axe":
+            giveItem(player, BAN_ITEMS.axe, "Ban Axe");
+            player.sendMessage("§a[Admin] Ban Axe given.");
+            return true;
+
+        case "banshovel":
+        case "shovel":
+            giveItem(player, BAN_ITEMS.shovel, "Ban Shovel");
+            player.sendMessage("§a[Admin] Ban Shovel given.");
+            return true;
+
+        case "banhoe":
+        case "hoe":
+            giveItem(player, BAN_ITEMS.hoe, "Ban Hoe");
+            player.sendMessage("§a[Admin] Ban Hoe given.");
+            return true;
+
+        // ===== BAN COMMANDS =====
         case "ban":
             if (!args[1]) {
                 player.sendMessage("§cUsage: !ban <player>");
@@ -124,7 +221,6 @@ function handleCommand(player, message) {
             const targetBan = args[1];
             if (banPlayer(targetBan)) {
                 player.sendMessage(`§4[Admin] §c${targetBan} has been permanently banned.`);
-                // Kick if online
                 for (const p of world.getAllPlayers()) {
                     if (p.name.toLowerCase() === targetBan.toLowerCase()) {
                         try {
@@ -166,53 +262,55 @@ function handleCommand(player, message) {
             player.sendMessage("§a[Admin] All bans cleared.");
             return true;
 
+        // ===== HELP =====
         case "adminhelp":
         case "help":
-            player.sendMessage("§6===== Admin Commands (only you) =====");
-            player.sendMessage("§e!bansword §7- Give yourself the Ban Sword");
-            player.sendMessage("§e!ban <player> §7- Permanently ban a player");
-            player.sendMessage("§e!unban <player> §7- Unban a player");
-            player.sendMessage("§e!banlist §7- Show all banned players");
-            player.sendMessage("§e!clearbans §7- Clear entire ban list");
+            player.sendMessage("§6========== ADMIN COMMANDS (ONLY YOU) ==========");
+            player.sendMessage("§e!bangear §7- Give full Ban Armor + Tools");
+            player.sendMessage("§e!banarmor §7- Give full Ban Armor set");
+            player.sendMessage("§e!bantools §7- Give full Ban Tools set");
+            player.sendMessage("§e!bansword §7- Give Ban Sword only");
+            player.sendMessage("§e!banhelmet / !banchest / !banlegs / !banboots");
+            player.sendMessage("§e!banpick / !banaxe / !banshovel / !banhoe");
+            player.sendMessage("§e!ban <player> §7- Permanently ban");
+            player.sendMessage("§e!unban <player> §7- Unban");
+            player.sendMessage("§e!banlist §7- Show banned players");
+            player.sendMessage("§e!clearbans §7- Clear all bans");
             player.sendMessage("§e!adminhelp §7- Show this help");
             return true;
 
         default:
-            return false; // not one of our commands
+            return false;
     }
 }
 
 // ==================== EVENTS ====================
 
-// Chat command interceptor (only you can use them)
+// Chat commands - HARD LOCKED to you only
 world.beforeEvents.chatSend.subscribe((event) => {
     const message = event.message.trim();
     if (!message.startsWith(PREFIX)) return;
 
     const player = event.sender;
 
-    // Only thewarrior3648 is allowed to run these commands
-    if (!isSwordOwner(player.name)) {
+    if (!isOwner(player.name)) {
         event.cancel = true;
         player.sendMessage("§c[Admin] These commands are locked to thewarrior3648 only.");
         return;
     }
 
-    // Cancel the chat message so others don't see the command
     event.cancel = true;
 
-    // Run the command
     system.run(() => {
         handleCommand(player, message);
     });
 });
 
-// On join: OP + give sword + check ban
+// On join
 world.afterEvents.playerSpawn.subscribe((event) => {
     const player = event.player;
 
     if (event.initialSpawn) {
-        // Ban check first
         if (isBanned(player.name)) {
             system.runTimeout(() => {
                 try {
@@ -225,16 +323,16 @@ world.afterEvents.playerSpawn.subscribe((event) => {
         if (isAdmin(player.name)) {
             system.runTimeout(() => {
                 grantOp(player);
-                if (isSwordOwner(player.name)) {
-                    giveBanSword(player);
-                    player.sendMessage("§6[Admin] Type §e!adminhelp §6for your exclusive commands.");
+                if (isOwner(player.name)) {
+                    giveFullGear(player);
+                    player.sendMessage("§6[Admin] Type §e!adminhelp §6for all your exclusive commands.");
                 }
             }, 20);
         }
     }
 });
 
-// Keep OP alive
+// Keep OP
 system.runInterval(() => {
     for (const player of world.getAllPlayers()) {
         if (isAdmin(player.name)) {
@@ -243,7 +341,7 @@ system.runInterval(() => {
     }
 }, 200);
 
-// ==================== ONESHOT + BAN ON HIT ====================
+// Ban Sword oneshot + ban
 world.afterEvents.entityHurt.subscribe((event) => {
     const hurtEntity = event.hurtEntity;
     const damageSource = event.damageSource;
@@ -252,39 +350,34 @@ world.afterEvents.entityHurt.subscribe((event) => {
 
     const attacker = damageSource.damagingEntity;
 
-    // Only thewarrior3648 can use the power
-    if (attacker.typeId !== "minecraft:player" || !isSwordOwner(attacker.name)) return;
+    if (attacker.typeId !== "minecraft:player" || !isOwner(attacker.name)) return;
 
-    // Check if holding the Ban Sword
     const equippable = attacker.getComponent("minecraft:equippable");
     if (!equippable) return;
 
     const weapon = equippable.getEquipment(EquipmentSlot.Mainhand);
-    if (!weapon || weapon.typeId !== BAN_SWORD_ID) return;
+    if (!weapon || weapon.typeId !== BAN_ITEMS.sword) return;
 
-    // ONESHOT
     try {
         hurtEntity.runCommandAsync("kill @s");
         hurtEntity.applyDamage(99999, { cause: "entityAttack", damagingEntity: attacker });
     } catch (e) {}
 
-    // If it was a player → BAN
     if (hurtEntity.typeId === "minecraft:player") {
         const victimName = hurtEntity.name;
-
         banPlayer(victimName);
 
         try {
-            hurtEntity.sendMessage("§c§lYou have been BANNED by thewarrior3648's Admin Ban Sword!");
+            hurtEntity.sendMessage("§c§lYou have been BANNED by thewarrior3648's Ban Sword!");
             attacker.sendMessage(`§4[Ban Sword] §c${victimName} has been permanently banned.`);
 
             system.runTimeout(() => {
                 try {
-                    world.getDimension("overworld").runCommandAsync(`kick "${victimName}" §cBanned by Admin Ban Sword`);
+                    world.getDimension("overworld").runCommandAsync(`kick "${victimName}" §cBanned by Ban Sword`);
                 } catch (e) {}
             }, 5);
         } catch (e) {}
     }
 });
 
-console.warn("[Admin Mod] Loaded - Exclusive commands + Ban Sword locked to thewarrior3648");
+console.warn("[Admin Mod] Full Ban Gear + exclusive commands locked to thewarrior3648");
