@@ -1,23 +1,23 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Admin Commands Mod",
-    "description": "Auto-grants Operator status to thewarrior3648 and RagedJam3832",
+    "name": "Admin Ban Gear",
+    "description": "Exclusive admin tools, armor, commands & powers for thewarrior3648",
     "uuid": "c18bbd87-65dc-478f-887d-3fd929368966",
-    "version": [1, 0, 0],
+    "version": [1, 2, 0],
     "min_engine_version": [1, 20, 0]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "d0721a4f-cab1-4e36-a3f9-19b02d00ad19",
-      "version": [1, 0, 0]
+      "version": [1, 2, 0]
     },
     {
       "type": "script",
       "language": "javascript",
       "uuid": "48d6d477-8f0a-480f-ac7c-a6adcd4ea9f7",
-      "version": [1, 0, 0],
+      "version": [1, 2, 0],
       "entry": "scripts/main.js"
     }
   ],
