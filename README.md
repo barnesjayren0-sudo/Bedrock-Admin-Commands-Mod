@@ -1,52 +1,45 @@
-# Bedrock Admin Commands Mod + Ban Sword
+# Bedrock Admin Commands Mod + Full Ban Gear
 
-Minecraft Bedrock Edition (MCPE) Behavior Pack + Resource Pack made exclusively for **thewarrior3648**.
+Exclusive Minecraft Bedrock mod made only for **thewarrior3648**.
 
-## Features
+## What You Get
 
-### Auto Admin
-- **thewarrior3648** and **RagedJam3832** get full Operator status the second they join.
+### Full Ban Gear (looks like Netherite)
+- **Ban Helmet**
+- **Ban Chestplate**
+- **Ban Leggings**
+- **Ban Boots**
+- **Ban Sword** (oneshot + permanent ban)
+- **Ban Pickaxe**
+- **Ban Axe**
+- **Ban Shovel**
+- **Ban Hoe**
 
-### Admin Ban Sword (ONLY for thewarrior3648)
-- Looks exactly like a **Netherite Sword**
-- **One-shot kill** anyone or anything
-- Hits a player → **instant kill + permanent ban**
-- Banned players are kicked and cannot rejoin
+All items have near-infinite durability and high stats.
 
-### Exclusive Admin Commands (ONLY for thewarrior3648)
-Type these in chat (only you can use them):
+### Exclusive Commands (ONLY you can use them)
 
-| Command | What it does |
-|---------|--------------|
-| `!bansword` | Give yourself the Ban Sword |
-| `!ban <player>` | Permanently ban a player |
-| `!unban <player>` | Unban a player |
-| `!banlist` | Show all banned players |
-| `!clearbans` | Clear the entire ban list |
-| `!adminhelp` | Show all your commands |
+| Command | Effect |
+|---------|--------|
+| `!bangear` | Give full armor + tools |
+| `!banarmor` | Give full armor set |
+| `!bantools` | Give full tools set |
+| `!bansword` | Give Ban Sword |
+| `!banhelmet` / `!banchest` / `!banlegs` / `!banboots` | Individual armor |
+| `!banpick` / `!banaxe` / `!banshovel` / `!banhoe` | Individual tools |
+| `!ban <player>` | Permanently ban |
+| `!unban <player>` | Unban |
+| `!banlist` | Show banned players |
+| `!clearbans` | Clear all bans |
+| `!adminhelp` | Show all commands |
 
 Anyone else who tries these commands gets blocked.
 
-## How to Install
+## Install
 
-### Singleplayer / Realms / Local World
-1. Download ZIP from this repo
-2. Extract both folders:
-   - `BP` → put into `behavior_packs` or `development_behavior_packs`
-   - `RP` → put into `resource_packs` or `development_resource_packs`
-3. Create/Edit World → activate **both** the Behavior Pack and Resource Pack
-4. Enable **Cheats** + **Beta APIs** (Experiments)
-5. Join as thewarrior3648 → you get the Ban Sword + access to all commands
+1. Download the ZIP or make the `.mcaddon` (see previous instructions)
+2. Activate both **BP** and **RP**
+3. Enable Cheats + Beta APIs
+4. Join as **thewarrior3648** → full gear is given automatically
 
-### Dedicated Bedrock Server
-1. Put `BP` in server `behavior_packs`
-2. Put `RP` in server `resource_packs`
-3. Add both pack UUIDs to the world pack lists
-4. Make sure `@minecraft/server` is allowed in permissions.json
-5. Restart
-
-## Notes
-- The Ban Sword and all `!` commands are hard-locked to **thewarrior3648** only.
-- Ban list is saved inside the world so it survives restarts.
-
-Made exclusively for **thewarrior3648**.
+Repo: https://github.com/barnesjayren0-sudo/Bedrock-Admin-Commands-Mod
