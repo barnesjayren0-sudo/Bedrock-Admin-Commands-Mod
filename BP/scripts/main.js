@@ -6,9 +6,12 @@ const ADMINS = [
     "RagedJam3832"
 ];
 
-// Only thewarrior3648 gets the Ban Sword and can use its power
+// Only thewarrior3648 gets the Ban Sword + exclusive admin commands
 const SWORD_OWNER = "thewarrior3648";
 const BAN_SWORD_ID = "admin:ban_sword";
+
+// Command prefix (type in chat)
+const PREFIX = "!";
 
 // ==================== HELPERS ====================
 function isAdmin(playerName) {
@@ -30,7 +33,7 @@ function grantOp(player) {
     }
 }
 
-// Simple ban list stored in world dynamic property
+// Ban list stored in world dynamic property
 function getBannedList() {
     try {
         const raw = world.getDynamicProperty("admin_banned_players");
@@ -47,37 +50,162 @@ function saveBannedList(list) {
 
 function banPlayer(name) {
     const list = getBannedList();
-    if (!list.includes(name.toLowerCase())) {
-        list.push(name.toLowerCase());
+    const lower = name.toLowerCase();
+    if (!list.includes(lower)) {
+        list.push(lower);
         saveBannedList(list);
+        return true;
     }
+    return false;
+}
+
+function unbanPlayer(name) {
+    const list = getBannedList();
+    const lower = name.toLowerCase();
+    const index = list.indexOf(lower);
+    if (index !== -1) {
+        list.splice(index, 1);
+        saveBannedList(list);
+        return true;
+    }
+    return false;
 }
 
 function isBanned(name) {
     return getBannedList().includes(name.toLowerCase());
 }
 
-// ==================== GIVE SWORD TO OWNER ====================
+// ==================== GIVE SWORD ====================
 function giveBanSword(player) {
     try {
         const inv = player.getComponent("minecraft:inventory");
-        if (!inv || !inv.container) return;
+        if (!inv || !inv.container) return false;
 
-        // Check if already has it
+        // Remove existing ones first so we don't duplicate forever
         for (let i = 0; i < inv.container.size; i++) {
             const item = inv.container.getItem(i);
-            if (item && item.typeId === BAN_SWORD_ID) return;
+            if (item && item.typeId === BAN_SWORD_ID) {
+                inv.container.setItem(i, undefined);
+            }
         }
 
         const sword = new ItemStack(BAN_SWORD_ID, 1);
         inv.container.addItem(sword);
         player.sendMessage("§4[Admin Mod] Ban Sword granted. One hit = instant kill + ban.");
+        return true;
     } catch (e) {
         console.error("[Admin Mod] Failed to give Ban Sword: " + e);
+        return false;
+    }
+}
+
+// ==================== COMMAND SYSTEM (ONLY thewarrior3648) ====================
+function handleCommand(player, message) {
+    if (!isSwordOwner(player.name)) return false; // HARD LOCK - only you
+
+    const args = message.slice(PREFIX.length).trim().split(/\s+/);
+    const cmd = args[0]?.toLowerCase();
+
+    if (!cmd) return false;
+
+    switch (cmd) {
+        case "bansword":
+        case "sword":
+        case "givesword":
+            giveBanSword(player);
+            player.sendMessage("§a[Admin] Ban Sword given.");
+            return true;
+
+        case "ban":
+            if (!args[1]) {
+                player.sendMessage("§cUsage: !ban <player>");
+                return true;
+            }
+            const targetBan = args[1];
+            if (banPlayer(targetBan)) {
+                player.sendMessage(`§4[Admin] §c${targetBan} has been permanently banned.`);
+                // Kick if online
+                for (const p of world.getAllPlayers()) {
+                    if (p.name.toLowerCase() === targetBan.toLowerCase()) {
+                        try {
+                            world.getDimension("overworld").runCommandAsync(`kick "${p.name}" §cBanned by thewarrior3648`);
+                        } catch (e) {}
+                    }
+                }
+            } else {
+                player.sendMessage(`§e[Admin] ${targetBan} is already banned.`);
+            }
+            return true;
+
+        case "unban":
+            if (!args[1]) {
+                player.sendMessage("§cUsage: !unban <player>");
+                return true;
+            }
+            const targetUnban = args[1];
+            if (unbanPlayer(targetUnban)) {
+                player.sendMessage(`§a[Admin] ${targetUnban} has been unbanned.`);
+            } else {
+                player.sendMessage(`§e[Admin] ${targetUnban} was not banned.`);
+            }
+            return true;
+
+        case "banlist":
+        case "bans":
+            const list = getBannedList();
+            if (list.length === 0) {
+                player.sendMessage("§a[Admin] Ban list is empty.");
+            } else {
+                player.sendMessage(`§4[Admin] Banned players (${list.length}):`);
+                player.sendMessage("§c" + list.join(", "));
+            }
+            return true;
+
+        case "clearbans":
+            saveBannedList([]);
+            player.sendMessage("§a[Admin] All bans cleared.");
+            return true;
+
+        case "adminhelp":
+        case "help":
+            player.sendMessage("§6===== Admin Commands (only you) =====");
+            player.sendMessage("§e!bansword §7- Give yourself the Ban Sword");
+            player.sendMessage("§e!ban <player> §7- Permanently ban a player");
+            player.sendMessage("§e!unban <player> §7- Unban a player");
+            player.sendMessage("§e!banlist §7- Show all banned players");
+            player.sendMessage("§e!clearbans §7- Clear entire ban list");
+            player.sendMessage("§e!adminhelp §7- Show this help");
+            return true;
+
+        default:
+            return false; // not one of our commands
     }
 }
 
 // ==================== EVENTS ====================
+
+// Chat command interceptor (only you can use them)
+world.beforeEvents.chatSend.subscribe((event) => {
+    const message = event.message.trim();
+    if (!message.startsWith(PREFIX)) return;
+
+    const player = event.sender;
+
+    // Only thewarrior3648 is allowed to run these commands
+    if (!isSwordOwner(player.name)) {
+        event.cancel = true;
+        player.sendMessage("§c[Admin] These commands are locked to thewarrior3648 only.");
+        return;
+    }
+
+    // Cancel the chat message so others don't see the command
+    event.cancel = true;
+
+    // Run the command
+    system.run(() => {
+        handleCommand(player, message);
+    });
+});
 
 // On join: OP + give sword + check ban
 world.afterEvents.playerSpawn.subscribe((event) => {
@@ -88,8 +216,7 @@ world.afterEvents.playerSpawn.subscribe((event) => {
         if (isBanned(player.name)) {
             system.runTimeout(() => {
                 try {
-                    player.runCommandAsync(`kick "${player.name}" §cYou are permanently banned by Admin Ban Sword`);
-                    world.getDimension("overworld").runCommandAsync(`kick "${player.name}" §cBanned by thewarrior3648`);
+                    world.getDimension("overworld").runCommandAsync(`kick "${player.name}" §cYou are permanently banned by thewarrior3648`);
                 } catch (e) {}
             }, 10);
             return;
@@ -100,6 +227,7 @@ world.afterEvents.playerSpawn.subscribe((event) => {
                 grantOp(player);
                 if (isSwordOwner(player.name)) {
                     giveBanSword(player);
+                    player.sendMessage("§6[Admin] Type §e!adminhelp §6for your exclusive commands.");
                 }
             }, 20);
         }
@@ -115,7 +243,7 @@ system.runInterval(() => {
     }
 }, 200);
 
-// ==================== ONESHOT + BAN LOGIC ====================
+// ==================== ONESHOT + BAN ON HIT ====================
 world.afterEvents.entityHurt.subscribe((event) => {
     const hurtEntity = event.hurtEntity;
     const damageSource = event.damageSource;
@@ -136,9 +264,7 @@ world.afterEvents.entityHurt.subscribe((event) => {
 
     // ONESHOT
     try {
-        // Force kill no matter what
         hurtEntity.runCommandAsync("kill @s");
-        // Also apply massive damage just in case
         hurtEntity.applyDamage(99999, { cause: "entityAttack", damagingEntity: attacker });
     } catch (e) {}
 
@@ -152,7 +278,6 @@ world.afterEvents.entityHurt.subscribe((event) => {
             hurtEntity.sendMessage("§c§lYou have been BANNED by thewarrior3648's Admin Ban Sword!");
             attacker.sendMessage(`§4[Ban Sword] §c${victimName} has been permanently banned.`);
 
-            // Kick immediately
             system.runTimeout(() => {
                 try {
                     world.getDimension("overworld").runCommandAsync(`kick "${victimName}" §cBanned by Admin Ban Sword`);
@@ -162,4 +287,4 @@ world.afterEvents.entityHurt.subscribe((event) => {
     }
 });
 
-console.warn("[Admin Mod] Loaded - Auto OP + Ban Sword active for thewarrior3648");
+console.warn("[Admin Mod] Loaded - Exclusive commands + Ban Sword locked to thewarrior3648");
