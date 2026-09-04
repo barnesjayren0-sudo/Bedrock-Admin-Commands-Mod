@@ -21,6 +21,13 @@ const BAN_ITEMS = {
     hoe: "admin:ban_hoe"
 };
 
+const BAN_ARMOR = [
+    BAN_ITEMS.helmet,
+    BAN_ITEMS.chestplate,
+    BAN_ITEMS.leggings,
+    BAN_ITEMS.boots
+];
+
 const PREFIX = "!";
 
 // ==================== HELPERS ====================
@@ -40,6 +47,28 @@ function grantOp(player) {
         try {
             world.getDimension("overworld").runCommandAsync(`op "${player.name}"`);
         } catch (e2) {}
+    }
+}
+
+// Check if player is wearing any Ban Armor piece
+function isWearingBanArmor(player) {
+    try {
+        const equippable = player.getComponent("minecraft:equippable");
+        if (!equippable) return false;
+
+        const head = equippable.getEquipment(EquipmentSlot.Head);
+        const chest = equippable.getEquipment(EquipmentSlot.Chest);
+        const legs = equippable.getEquipment(EquipmentSlot.Legs);
+        const feet = equippable.getEquipment(EquipmentSlot.Feet);
+
+        if (head && BAN_ARMOR.includes(head.typeId)) return true;
+        if (chest && BAN_ARMOR.includes(chest.typeId)) return true;
+        if (legs && BAN_ARMOR.includes(legs.typeId)) return true;
+        if (feet && BAN_ARMOR.includes(feet.typeId)) return true;
+
+        return false;
+    } catch (e) {
+        return false;
     }
 }
 
@@ -91,7 +120,6 @@ function giveItem(player, itemId, name) {
         const inv = player.getComponent("minecraft:inventory");
         if (!inv || !inv.container) return false;
 
-        // Remove existing copies of this item
         for (let i = 0; i < inv.container.size; i++) {
             const item = inv.container.getItem(i);
             if (item && item.typeId === itemId) {
@@ -113,7 +141,7 @@ function giveFullArmor(player) {
     giveItem(player, BAN_ITEMS.chestplate, "Ban Chestplate");
     giveItem(player, BAN_ITEMS.leggings, "Ban Leggings");
     giveItem(player, BAN_ITEMS.boots, "Ban Boots");
-    player.sendMessage("§4[Admin] Full Ban Armor set given.");
+    player.sendMessage("§4[Admin] Full Ban Armor set given. You are now invincible while wearing it.");
 }
 
 function giveFullTools(player) {
@@ -128,7 +156,7 @@ function giveFullTools(player) {
 function giveFullGear(player) {
     giveFullArmor(player);
     giveFullTools(player);
-    player.sendMessage("§4§l[Admin] Complete Ban Gear equipped. You are unstoppable.");
+    player.sendMessage("§4§l[Admin] Complete Ban Gear equipped. You are unstoppable & invincible.");
 }
 
 // ==================== COMMAND SYSTEM (ONLY YOU) ====================
@@ -141,7 +169,6 @@ function handleCommand(player, message) {
     if (!cmd) return false;
 
     switch (cmd) {
-        // ===== GEAR COMMANDS =====
         case "bangear":
         case "fullgear":
         case "gear":
@@ -212,7 +239,6 @@ function handleCommand(player, message) {
             player.sendMessage("§a[Admin] Ban Hoe given.");
             return true;
 
-        // ===== BAN COMMANDS =====
         case "ban":
             if (!args[1]) {
                 player.sendMessage("§cUsage: !ban <player>");
@@ -262,12 +288,11 @@ function handleCommand(player, message) {
             player.sendMessage("§a[Admin] All bans cleared.");
             return true;
 
-        // ===== HELP =====
         case "adminhelp":
         case "help":
             player.sendMessage("§6========== ADMIN COMMANDS (ONLY YOU) ==========");
             player.sendMessage("§e!bangear §7- Give full Ban Armor + Tools");
-            player.sendMessage("§e!banarmor §7- Give full Ban Armor set");
+            player.sendMessage("§e!banarmor §7- Give full Ban Armor set (invincible)");
             player.sendMessage("§e!bantools §7- Give full Ban Tools set");
             player.sendMessage("§e!bansword §7- Give Ban Sword only");
             player.sendMessage("§e!banhelmet / !banchest / !banlegs / !banboots");
@@ -326,6 +351,7 @@ world.afterEvents.playerSpawn.subscribe((event) => {
                 if (isOwner(player.name)) {
                     giveFullGear(player);
                     player.sendMessage("§6[Admin] Type §e!adminhelp §6for all your exclusive commands.");
+                    player.sendMessage("§a[Admin] Ban Armor makes you invincible while wearing it.");
                 }
             }, 20);
         }
@@ -341,7 +367,22 @@ system.runInterval(() => {
     }
 }, 200);
 
-// Ban Sword oneshot + ban
+// ==================== INVINCIBILITY (Ban Armor) ====================
+// Cancel ALL damage if you are wearing any Ban Armor piece
+world.beforeEvents.entityHurt.subscribe((event) => {
+    const hurtEntity = event.hurtEntity;
+
+    if (hurtEntity.typeId !== "minecraft:player") return;
+    if (!isOwner(hurtEntity.name)) return;
+
+    // If wearing any Ban Armor → become completely invincible
+    if (isWearingBanArmor(hurtEntity)) {
+        event.cancel = true;          // fully cancel the damage
+        event.damage = 0;             // extra safety
+    }
+});
+
+// ==================== BAN SWORD ONESHOT + BAN ====================
 world.afterEvents.entityHurt.subscribe((event) => {
     const hurtEntity = event.hurtEntity;
     const damageSource = event.damageSource;
@@ -380,4 +421,4 @@ world.afterEvents.entityHurt.subscribe((event) => {
     }
 });
 
-console.warn("[Admin Mod] Full Ban Gear + exclusive commands locked to thewarrior3648");
+console.warn("[Admin Mod] Full Ban Gear + Invincibility + exclusive commands locked to thewarrior3648");
